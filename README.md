@@ -108,7 +108,7 @@ If you want to contribute or build locally:
 
 ```bash
 # Clone repository
-git clone https://github.com/YOUR_USERNAME/pp.git
+git clone https://github.com/uxname/pp.git
 cd pp
 
 # Install dependencies

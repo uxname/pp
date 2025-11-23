@@ -24,6 +24,14 @@
   ],
   "author": "uxname",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uxname/pp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/uxname/pp/issues"
+  },
+  "homepage": "https://github.com/uxname/pp#readme",
   "devDependencies": {
     "@types/bun": "latest"
   },
