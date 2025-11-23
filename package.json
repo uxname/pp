@@ -1,0 +1,23 @@
+{
+  "name": "pakk",
+  "type": "module",
+  "private": false,
+  "scripts": {
+    "dev": "bun run src/index.ts",
+    "build": "bun build ./src/index.ts --outfile=./dist/index.js --target=node --minify",
+    "prepublishOnly": "bun run build"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@types/prompts": "^2.4.9",
+    "commander": "^14.0.2",
+    "ignore": "^7.0.5",
+    "ora": "^9.0.0",
+    "prompts": "^2.4.2"
+  }
+}
