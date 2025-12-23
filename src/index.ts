@@ -4,6 +4,7 @@ import { resolve } from 'node:path';
 import { cwd } from 'node:process';
 import { program } from 'commander';
 import ora from 'ora';
+import pkg from '../package.json';
 import { addToHistory, showHistoryMenu } from './cli/history';
 import { writeOutput } from './cli/output';
 import { runStrip } from './commands/strip';
@@ -59,15 +60,19 @@ async function main() {
   const SYSTEM_ARGS_COUNT = 2;
 
   program
-    .version('1.5.0')
+    .version(pkg.version)
     .description('PrintProject (pp) — Codebase bundler & utility');
 
   program
     .command('strip [path]')
-    .description('Remove all comments from JS/TS files in the directory')
+    .description('Remove all comments from JS/TS files')
     .option('--no-gitignore', 'Disable .gitignore parsing')
     .option('-e, --exclude <patterns...>', 'Exclude patterns', [])
     .option('-y, --yes', 'Skip confirmation prompt')
+    .option(
+      '-a, --all',
+      'Process ALL files (default: only git changed/untracked)',
+    )
     .option(
       '-d, --dry-run',
       'Show which files would be processed without modifying them',
@@ -80,6 +85,7 @@ async function main() {
         yes: options.yes,
         dryRun: options.dryRun,
         noHistory: options.history === false,
+        all: options.all,
       });
     });
 

@@ -1,6 +1,6 @@
 {
   "name": "@uxname/pp",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "PrintProject (pp) — A lightning-fast CLI tool to bundle your codebase into a single context file for LLMs (ChatGPT, Claude, DeepSeek). Features smart prioritization, interactive history, and gitignore support.",
   "type": "module",
   "bin": {

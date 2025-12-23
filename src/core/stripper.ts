@@ -1,5 +1,4 @@
 import { readFileSync, writeFileSync } from 'node:fs';
-import strip from 'strip-comments';
 
 const SUPPORTED_EXTENSIONS = new Set([
   '.js',
@@ -21,9 +20,19 @@ export function stripCommentsFromFile(filePath: string): boolean {
   try {
     const content = readFileSync(filePath, 'utf-8');
 
-    const stripped = strip(content, {
-      keepProtected: false,
-      preserveNewlines: false,
+    const patternStrings =
+      '"(?:\\\\[\\s\\S]|[^"\\\\])*"|\'(?:\\\\[\\s\\S]|[^\'\\\\])*\'|`(?:[^`\\\\]|\\\\.)*`';
+
+    const patternComments = '//[^\\n\\r]*|/\\*[\\s\\S]*?\\*/';
+
+    const regex = new RegExp(`(${patternStrings})|(${patternComments})`, 'g');
+
+    const stripped = content.replace(regex, (_match, str, _comment) => {
+      if (typeof str !== 'undefined') {
+        return str;
+      }
+
+      return '';
     });
 
     const cleaned = stripped.replace(/(\r\n|\r|\n){3,}/g, '\n\n');
