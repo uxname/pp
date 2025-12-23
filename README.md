@@ -2,9 +2,10 @@
 
 **PrintProject** is a blazing fast CLI tool designed to prepare your codebase for Large Language Models (LLMs).
 
-It scans your directory, ignores the junk (binaries, locks, `node_modules`), intelligently prioritizes critical files (like `package.json` or `README`), and concatenates everything into a single text output.
+It scans your directory, ignores the junk (binaries, locks, `node_modules`), intelligently prioritizes critical files (
+like `package.json` or `README`), and concatenates everything into a single text output.
 
-Ideal for pasting context into ChatGPT, Claude, or DeepSeek to get better code assistance.
+**New:** Now includes a **Code Cleanup** tool to strip comments from your project!
 
 ![License](https://img.shields.io/npm/l/@uxname/pp)
 ![Version](https://img.shields.io/npm/v/@uxname/pp)
@@ -12,11 +13,13 @@ Ideal for pasting context into ChatGPT, Claude, or DeepSeek to get better code a
 ## ✨ Features
 
 - **🚀 Fast & Lightweight:** Built with Bun, runs anywhere Node.js runs.
-- **🧠 Context-Aware:** Automatically puts `package.json`, docs, and entry points at the top of the file so the LLM understands the project structure first.
+- **🧠 Context-Aware:** Automatically puts `package.json`, docs, and entry points at the top of the file.
 - **🛡️ Smart Filtering:**
-  - Respects `.gitignore`.
-  - Automatically excludes binary files, lockfiles, and huge directories (`node_modules`, `.git`, `dist`).
-  - Skips files larger than 1MB by default.
+    - Respects `.gitignore`.
+    - Automatically excludes binary files, lockfiles, and huge directories (`node_modules`, `.git`, `dist`).
+    - Skips files larger than 1MB by default.
+- **🧹 Code Cleanup:** Safely remove all comments from JS/TS files (`.ts`, `.js`, `.tsx`, `.jsx`) to reduce token usage
+  or minify code.
 - **📜 Interactive History:** Run `pp` without arguments to select from your recent commands.
 - **📋 clipboard-ready:** Output to a file or pipe directly to stdout.
 
@@ -28,79 +31,90 @@ Install globally via npm:
 npm install -g @uxname/pp
 ```
 
-The command `pp` will now be available in your terminal.
-
 ## 🚀 Usage
 
-### Basic Usage
+### 1. Bundle Context (Default)
 
-Run in the current directory. By default, it creates a file named after the directory (e.g., `my-project.txt`).
+Scan the current directory and generate a text file for LLMs.
 
 ```bash
+# Basic usage
 pp
-```
 
-*If you run it without arguments, it may also show a history menu of previous commands.*
-
-### Specify Directory and Output
-
-Scan a specific folder and save to a specific file:
-
-```bash
+# Specify output file
 pp ./backend -o context.txt
+
+# Pipe to clipboard (macOS)
+pp . --stdout | pbcopy
 ```
 
-### Pipe to Clipboard (macOS/Linux)
+### 2. Strip Comments (Cleanup)
 
-Use the stdout flag to pipe content directly to your clipboard:
+Remove all comments (`// ...`, `/* ... */`) from JavaScript and TypeScript files in a directory.
+
+> **⚠️ Warning:** This command **modifies files in place**. Always commit your changes before running!
+
+**Dry Run (Check what will happen):**
+See which files will be modified without actually touching them.
 
 ```bash
-# macOS
-pp . --stdout | pbcopy
+pp strip --dry-run
+```
 
-# Linux (xclip)
-pp . --stdout | xclip -selection clipboard
+**Execute Cleanup:**
+This will ask for confirmation before proceeding.
+
+```bash
+pp strip
+# or
+pp strip ./src
+```
+
+**Force Execute (No Prompt):**
+Useful for scripts or CI/CD.
+
+```bash
+pp strip -y
 ```
 
 ## ⚙️ Options & Flags
 
-| Flag | Description |
-|------|-------------|
-| `[directory]` | The directory to scan (default: `.`) |
-| `-o, --output <file>` | Specify the output file path. |
-| `-s, --stdout` | Print to stdout instead of creating a file. |
-| `--exclude <pattern>` | Add custom glob patterns to exclude (e.g. `--exclude "*.css"`). |
-| `--no-gitignore` | Disable `.gitignore` parsing (scan everything except default excludes). |
+### Bundle Command (`pp [path]`)
 
-### Examples
+| Flag                  | Description                                                             |
+|-----------------------|-------------------------------------------------------------------------|
+| `-o, --output <file>` | Specify the output file path.                                           |
+| `-s, --stdout`        | Print to stdout instead of creating a file.                             |
+| `--exclude <pattern>` | Add custom glob patterns to exclude (e.g. `--exclude "*.css"`).         |
+| `--no-gitignore`      | Disable `.gitignore` parsing (scan everything except default excludes). |
 
-**Exclude all CSS and test files:**
-```bash
-pp . --exclude "*.css" --exclude "*.test.ts"
-```
+### Strip Command (`pp strip [path]`)
 
-**Ignore gitignore rules (include everything):**
-```bash
-pp . --no-gitignore
-```
+| Flag             | Description                                                 |
+|------------------|-------------------------------------------------------------|
+| `-d, --dry-run`  | Show which files would be processed without modifying them. |
+| `-y, --yes`      | Skip confirmation prompt (Danger!).                         |
+| `-e, --exclude`  | Exclude patterns from stripping.                            |
+| `--no-gitignore` | Disable `.gitignore` parsing.                               |
 
 ## 🧠 How it Sorts (Priority Rules)
 
-`pp` doesn't just dump files alphabetically. It sorts them to maximize LLM understanding:
+`pp` sorts files to maximize LLM understanding:
 
-1.  **Manifests:** `package.json`, `Cargo.toml`, `go.mod`, etc.
-2.  **Documentation:** `README.md`, `Dockerfile`.
-3.  **Entry Points:** `index.ts`, `main.go`, `app.py`.
-4.  **Config:** Configuration files.
-5.  **Source Code:** Files in `src/`, `lib/`, etc.
-6.  **Tests:** Test files are placed last.
+1. **Manifests:** `package.json`, `Cargo.toml`, etc.
+2. **Documentation:** `README.md`, `Dockerfile`.
+3. **Entry Points:** `index.ts`, `main.go`.
+4. **Config:** Configuration files.
+5. **Source Code:** Files in `src/`, `lib/`.
+6. **Tests:** Test files are placed last.
 
 ## 🚫 Default Exclusions
 
 `pp` automatically ignores:
+
 - **Directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `.vscode`, `__pycache__`, etc.
 - **Files:** Lockfiles (`package-lock.json`, `yarn.lock`), `.DS_Store`, `.env`.
-- **Extensions:** Images, videos, archives, binaries (`.png`, `.exe`, `.zip`, etc.).
+- **Extensions:** Images, videos, archives, binaries.
 
 ## 🛠 Development
 

@@ -1,6 +1,6 @@
 {
   "name": "@uxname/pp",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "PrintProject (pp) — A lightning-fast CLI tool to bundle your codebase into a single context file for LLMs (ChatGPT, Claude, DeepSeek). Features smart prioritization, interactive history, and gitignore support.",
   "type": "module",
   "bin": {
@@ -12,9 +12,16 @@
     "LICENSE"
   ],
   "scripts": {
+    "________________ BUILD AND RUN ________________": "",
     "dev": "bun run src/index.ts",
     "build": "bun build ./src/index.ts --outfile=./dist/index.js --target=node --minify",
-    "prepublishOnly": "bun run build"
+    "prepublishOnly": "bun run build",
+    "________________ FORMAT AND LINT ________________": "",
+    "lint": "biome check",
+    "lint:fix": "biome check --write",
+    "lint:fix:unsafe": "biome check --write --unsafe",
+    "ts:check": "tsc --noEmit",
+    "check": "run-p ts:check lint"
   },
   "keywords": [
     "cli",
@@ -34,13 +41,17 @@
   },
   "homepage": "https://github.com/uxname/pp#readme",
   "devDependencies": {
-    "@types/bun": "latest"
+    "@biomejs/biome": "^2.3.10",
+    "@types/bun": "latest",
+    "@types/strip-comments": "^2.0.4",
+    "npm-run-all": "^4.1.5"
   },
   "dependencies": {
     "@types/prompts": "^2.4.9",
     "commander": "^14.0.2",
     "ignore": "^7.0.5",
     "ora": "^9.0.0",
-    "prompts": "^2.4.2"
+    "prompts": "^2.4.2",
+    "strip-comments": "^2.0.1"
   }
 }

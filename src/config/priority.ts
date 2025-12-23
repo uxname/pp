@@ -3,7 +3,7 @@ import type { PriorityRule } from '../types';
 export const PRIORITY_RULES: PriorityRule[] = [
   {
     score: 100,
-    test: (relativePath: string, fileBasename: string) =>
+    test: (_relativePath: string, fileBasename: string) =>
       fileBasename === 'README.md' ||
       fileBasename === 'package.json' ||
       fileBasename === 'Dockerfile' ||
@@ -12,12 +12,12 @@ export const PRIORITY_RULES: PriorityRule[] = [
   },
   {
     score: 90,
-    test: (relativePath: string, fileBasename: string) =>
+    test: (_relativePath: string, fileBasename: string) =>
       fileBasename.endsWith('.md') && !fileBasename.endsWith('CHANGELOG.md'),
   },
   {
     score: 80,
-    test: (relativePath: string, fileBasename: string) =>
+    test: (_relativePath: string, fileBasename: string) =>
       fileBasename.endsWith('.ts') ||
       fileBasename.endsWith('.tsx') ||
       fileBasename.endsWith('.js') ||
@@ -25,7 +25,7 @@ export const PRIORITY_RULES: PriorityRule[] = [
   },
   {
     score: 70,
-    test: (relativePath: string, fileBasename: string) =>
+    test: (_relativePath: string, fileBasename: string) =>
       fileBasename.endsWith('.py') ||
       fileBasename.endsWith('.go') ||
       fileBasename.endsWith('.rs') ||
@@ -35,7 +35,7 @@ export const PRIORITY_RULES: PriorityRule[] = [
   },
   {
     score: 60,
-    test: (relativePath: string, fileBasename: string) =>
+    test: (_relativePath: string, fileBasename: string) =>
       fileBasename.endsWith('.html') ||
       fileBasename.endsWith('.css') ||
       fileBasename.endsWith('.scss') ||
@@ -43,7 +43,7 @@ export const PRIORITY_RULES: PriorityRule[] = [
   },
   {
     score: 50,
-    test: (relativePath: string, fileBasename: string) =>
+    test: (_relativePath: string, fileBasename: string) =>
       fileBasename.endsWith('.json') ||
       fileBasename.endsWith('.yaml') ||
       fileBasename.endsWith('.yml') ||
@@ -60,7 +60,7 @@ export const PRIORITY_RULES: PriorityRule[] = [
   },
   {
     score: 5,
-    test: (relativePath: string, fileBasename: string) =>
+    test: (_relativePath: string, fileBasename: string) =>
       fileBasename.endsWith('.d.ts') ||
       fileBasename.endsWith('.min.js') ||
       fileBasename.endsWith('.bundle.js'),
