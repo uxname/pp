@@ -79,5 +79,6 @@ export const DEFAULT_CONFIG: Config = {
     '.css',
     '.scss',
     '.sass',
+    '.md',
   ]),
 };
