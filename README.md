@@ -1,15 +1,15 @@
-**koda** is a blazing fast CLI tool designed to prepare your codebase for Large Language Models (LLMs).
-# koda
+**kodu** is a blazing fast CLI tool designed to prepare your codebase for Large Language Models (LLMs).
+# kodu
 
-**koda** is a blazing fast CLI tool designed to prepare your codebase for Large Language Models (LLMs).
+**kodu** is a blazing fast CLI tool designed to prepare your codebase for Large Language Models (LLMs).
 
 It scans your directory, ignores the junk (binaries, locks, `node_modules`), intelligently prioritizes critical files (
 like `package.json` or `README`), and concatenates everything into a single text output.
 
 **New:** Now includes a **Code Cleanup** tool to strip comments from your project!
 
-![License](https://img.shields.io/npm/l/koda)
-![Version](https://img.shields.io/npm/v/koda)
+![License](https://img.shields.io/npm/l/kodu)
+![Version](https://img.shields.io/npm/v/kodu)
 
 ## ✨ Features
 
@@ -21,7 +21,7 @@ like `package.json` or `README`), and concatenates everything into a single text
     - Skips files larger than 1MB by default.
 - **🧹 Code Cleanup:** Safely remove all comments from JS/TS files (`.ts`, `.js`, `.tsx`, `.jsx`) to reduce token usage
   or minify code.
-- **📜 Interactive History:** Run `koda` without arguments to select from your recent commands.
+- **📜 Interactive History:** Run `kodu` without arguments to select from your recent commands.
 - **📋 clipboard-ready:** Output to a file or pipe directly to stdout.
 
 ## 📦 Installation
@@ -29,7 +29,7 @@ like `package.json` or `README`), and concatenates everything into a single text
 Install globally via npm:
 
 ```bash
-npm install -g koda
+npm install -g kodu
 ```
 
 ## 🚀 Usage
@@ -40,13 +40,13 @@ Scan the current directory and generate a text file for LLMs.
 
 ```bash
 # Basic usage
-koda
+kodu
 
 # Specify output file
-koda ./backend -o context.txt
+kodu ./backend -o context.txt
 
 # Pipe to clipboard (macOS)
-koda . --stdout | pbcopy
+kodu . --stdout | pbcopy
 ```
 
 ### 2. Strip Comments (Cleanup)
@@ -59,28 +59,28 @@ Remove all comments (`// ...`, `/* ... */`) from JavaScript and TypeScript files
 See which files will be modified without actually touching them.
 
 ```bash
-koda strip --dry-run
+kodu strip --dry-run
 ```
 
 **Execute Cleanup:**
 This will ask for confirmation before proceeding.
 
 ```bash
-koda strip
+kodu strip
 # or
-koda strip ./src
+kodu strip ./src
 ```
 
 **Force Execute (No Prompt):**
 Useful for scripts or CI/CD.
 
 ```bash
-koda strip -y
+kodu strip -y
 ```
 
 ## ⚙️ Options & Flags
 
-### Bundle Command (`koda [path]`)
+### Bundle Command (`kodu [path]`)
 
 | Flag                  | Description                                                             |
 |-----------------------|-------------------------------------------------------------------------|
@@ -89,7 +89,7 @@ koda strip -y
 | `--exclude <pattern>` | Add custom glob patterns to exclude (e.g. `--exclude "*.css"`).         |
 | `--no-gitignore`      | Disable `.gitignore` parsing (scan everything except default excludes). |
 
-### Strip Command (`koda strip [path]`)
+### Strip Command (`kodu strip [path]`)
 
 | Flag             | Description                                                 |
 |------------------|-------------------------------------------------------------|
@@ -100,7 +100,7 @@ koda strip -y
 
 ## 🧠 How it Sorts (Priority Rules)
 
-`koda` sorts files to maximize LLM understanding:
+`kodu` sorts files to maximize LLM understanding:
 
 1. **Manifests:** `package.json`, `Cargo.toml`, etc.
 2. **Documentation:** `README.md`, `Dockerfile`.
@@ -111,7 +111,7 @@ koda strip -y
 
 ## 🚫 Default Exclusions
 
-`koda` automatically ignores:
+`kodu` automatically ignores:
 
 - **Directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `.vscode`, `__pycache__`, etc.
 - **Files:** Lockfiles (`package-lock.json`, `yarn.lock`), `.DS_Store`, `.env`.

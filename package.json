@@ -1,10 +1,10 @@
 {
-  "name": "koda",
+  "name": "kodu",
   "version": "1.1.2",
-  "description": "koda — A lightning-fast CLI tool to bundle your codebase into a single context file for LLMs (ChatGPT, Claude, DeepSeek). Features smart prioritization, interactive history, and gitignore support.",
+  "description": "kodu — A lightning-fast CLI tool to bundle your codebase into a single context file for LLMs (ChatGPT, Claude, DeepSeek). Features smart prioritization, interactive history, and gitignore support.",
   "type": "module",
   "bin": {
-    "koda": "./dist/index.js"
+    "kodu": "./dist/index.js"
   },
   "files": [
     "dist",

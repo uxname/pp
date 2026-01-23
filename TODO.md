@@ -1,4 +1,4 @@
 # TODO
 
-- pp init config
-- pp --watch path -o output.txt
+- kodu init config
+- kodu --watch path -o output.txt
