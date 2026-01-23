@@ -1,141 +1,26 @@
-**kodu** is a blazing fast CLI tool designed to prepare your codebase for Large Language Models (LLMs).
 # kodu
 
-**kodu** is a blazing fast CLI tool designed to prepare your codebase for Large Language Models (LLMs).
+This repository currently holds only the infrastructure required to rebuild the **kodu** CLI from scratch.
 
-It scans your directory, ignores the junk (binaries, locks, `node_modules`), intelligently prioritizes critical files (
-like `package.json` or `README`), and concatenates everything into a single text output.
+## Структура проекта
 
-**New:** Now includes a **Code Cleanup** tool to strip comments from your project!
+- `package.json`, `bun.lock`, `tsconfig.json`, `biome.json`, and `.gitignore` keep the tooling and scripts intact.
+- `src/index.ts` provides a tiny CLI scaffold that can be extended with new commands.
 
-![License](https://img.shields.io/npm/l/kodu)
-![Version](https://img.shields.io/npm/v/kodu)
-
-## ✨ Features
-
-- **🚀 Fast & Lightweight:** Built with Bun, runs anywhere Node.js runs.
-- **🧠 Context-Aware:** Automatically puts `package.json`, docs, and entry points at the top of the file.
-- **🛡️ Smart Filtering:**
-    - Respects `.gitignore`.
-    - Automatically excludes binary files, lockfiles, and huge directories (`node_modules`, `.git`, `dist`).
-    - Skips files larger than 1MB by default.
-- **🧹 Code Cleanup:** Safely remove all comments from JS/TS files (`.ts`, `.js`, `.tsx`, `.jsx`) to reduce token usage
-  or minify code.
-- **📜 Interactive History:** Run `kodu` without arguments to select from your recent commands.
-- **📋 clipboard-ready:** Output to a file or pipe directly to stdout.
-
-## 📦 Installation
-
-Install globally via npm:
+## Как начать
 
 ```bash
-npm install -g kodu
-```
-
-## 🚀 Usage
-
-### 1. Bundle Context (Default)
-
-Scan the current directory and generate a text file for LLMs.
-
-```bash
-# Basic usage
-kodu
-
-# Specify output file
-kodu ./backend -o context.txt
-
-# Pipe to clipboard (macOS)
-kodu . --stdout | pbcopy
-```
-
-### 2. Strip Comments (Cleanup)
-
-Remove all comments (`// ...`, `/* ... */`) from JavaScript and TypeScript files in a directory.
-
-> **⚠️ Warning:** This command **modifies files in place**. Always commit your changes before running!
-
-**Dry Run (Check what will happen):**
-See which files will be modified without actually touching them.
-
-```bash
-kodu strip --dry-run
-```
-
-**Execute Cleanup:**
-This will ask for confirmation before proceeding.
-
-```bash
-kodu strip
-# or
-kodu strip ./src
-```
-
-**Force Execute (No Prompt):**
-Useful for scripts or CI/CD.
-
-```bash
-kodu strip -y
-```
-
-## ⚙️ Options & Flags
-
-### Bundle Command (`kodu [path]`)
-
-| Flag                  | Description                                                             |
-|-----------------------|-------------------------------------------------------------------------|
-| `-o, --output <file>` | Specify the output file path.                                           |
-| `-s, --stdout`        | Print to stdout instead of creating a file.                             |
-| `--exclude <pattern>` | Add custom glob patterns to exclude (e.g. `--exclude "*.css"`).         |
-| `--no-gitignore`      | Disable `.gitignore` parsing (scan everything except default excludes). |
-
-### Strip Command (`kodu strip [path]`)
-
-| Flag             | Description                                                 |
-|------------------|-------------------------------------------------------------|
-| `-d, --dry-run`  | Show which files would be processed without modifying them. |
-| `-y, --yes`      | Skip confirmation prompt (Danger!).                         |
-| `-e, --exclude`  | Exclude patterns from stripping.                            |
-| `--no-gitignore` | Disable `.gitignore` parsing.                               |
-
-## 🧠 How it Sorts (Priority Rules)
-
-`kodu` sorts files to maximize LLM understanding:
-
-1. **Manifests:** `package.json`, `Cargo.toml`, etc.
-2. **Documentation:** `README.md`, `Dockerfile`.
-3. **Entry Points:** `index.ts`, `main.go`.
-4. **Config:** Configuration files.
-5. **Source Code:** Files in `src/`, `lib/`.
-6. **Tests:** Test files are placed last.
-
-## 🚫 Default Exclusions
-
-`kodu` automatically ignores:
-
-- **Directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `.vscode`, `__pycache__`, etc.
-- **Files:** Lockfiles (`package-lock.json`, `yarn.lock`), `.DS_Store`, `.env`.
-- **Extensions:** Images, videos, archives, binaries.
-
-## 🛠 Development
-
-If you want to contribute or build locally:
-
-```bash
-# Clone repository
-git clone https://github.com/uxname/pp.git
-cd pp
-
-# Install dependencies
 bun install
-
-# Run in dev mode
-bun run dev
-
-# Build for production
-bun run build
+bun run dev    # run the scaffold locally
+bun run build  # produce the bundled CLI
 ```
 
-## License
+## Следующие шаги
+
+1. Добавьте новые команды в `src/commands` и подключите их в `src/index.ts`.
+2. Перенесите любую инфраструктурную логику (history, сканеры, и т.п.) в новые модули под `src/core` с необходимой типизацией.
+3. Обновите документацию и AGENTS.md по мере появления реальных фич.
+
+## Лицензия
 
 MIT
