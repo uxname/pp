@@ -89,6 +89,7 @@
 - When adding a new command, update `AppModule`, ensure it is exported in `exports`, and register dependencies if needed.
 - When introducing new dependencies, clarify whether they are required at runtime (`dependencies`) or only for build tooling (`devDependencies`).
 - Add extra scripts to `package.json` with the `npm run` prefix and keep the existing separators (`________________ ...`) consistent.
+- Document ongoing plans in `docs/plan.md` (currently focused on the `--version` task) so contributors can quickly learn what to build next.
 
 ## 7. Balanced Automation Recommendations
 - `biome.json` already allows `unsafeParameterDecorators`, so Nest decorators can rely on parameter metadata without extra annotations.
