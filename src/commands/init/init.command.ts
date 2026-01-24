@@ -14,7 +14,7 @@ export class InitCommand extends CommandRunner {
     const configPath = path.join(process.cwd(), 'kodu.json');
 
     const defaultConfig: KoduConfig = {
-      llm: { provider: 'openai', model: 'gpt-4o' },
+      llm: { provider: 'openai', model: 'gpt-4o', apiKeyEnv: 'OPENAI_API_KEY' },
       cleaner: { whitelist: ['//!'], keepJSDoc: true },
       packer: {
         ignore: [
@@ -55,7 +55,11 @@ export class InitCommand extends CommandRunner {
     );
 
     const configToSave: KoduConfig = {
-      llm: { provider, model: defaultConfig.llm.model },
+      llm: {
+        provider,
+        model: defaultConfig.llm.model,
+        apiKeyEnv: defaultConfig.llm.apiKeyEnv,
+      },
       cleaner: { whitelist, keepJSDoc: defaultConfig.cleaner.keepJSDoc },
       packer: { ignore: ignoreList },
     };

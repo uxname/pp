@@ -3,6 +3,7 @@ import { z } from 'zod';
 const llmSchema = z.object({
   provider: z.literal('openai').default('openai'),
   model: z.string().default('gpt-4o'),
+  apiKeyEnv: z.string().default('OPENAI_API_KEY'),
 });
 
 const cleanerSchema = z.object({
@@ -26,7 +27,11 @@ const packerSchema = z.object({
 });
 
 export const configSchema = z.object({
-  llm: llmSchema.default({ provider: 'openai', model: 'gpt-4o' }),
+  llm: llmSchema.default({
+    provider: 'openai',
+    model: 'gpt-4o',
+    apiKeyEnv: 'OPENAI_API_KEY',
+  }),
   cleaner: cleanerSchema.default({ whitelist: ['//!'], keepJSDoc: true }),
   packer: packerSchema.default({
     ignore: [

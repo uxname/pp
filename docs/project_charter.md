@@ -62,6 +62,12 @@
     *   Формат: Conventional Commits.
     *   Интерактивное подтверждение сообщения.
 
+### Быстрый старт AI
+*   Установите ключ: `export OPENAI_API_KEY=<ключ>` (имя переменной настраивается через `llm.apiKeyEnv`).
+*   Ревью: `kodu review --mode bug|style|security [--json] [--copy]`.
+*   Коммит: `kodu commit [--edit] [--no-ask]`.
+*   В git diff автоматически исключаются файлы из `packer.ignore` (например, lock-файлы и `dist/`).
+
 ## 5. Границы проекта (Out of Scope for MVP)
 *   Поддержка языков, отличных от JS/TS (для команды `clean`). `pack` будет работать со всем текстом.
 *   AI-based удаление комментариев (слишком рискованно и медленно).

@@ -4,9 +4,7 @@
     "model": "gpt-4o"
   },
   "cleaner": {
-    "whitelist": [
-      "//!"
-    ],
+    "whitelist": ["//!"],
     "keepJSDoc": true
   },
   "packer": {
