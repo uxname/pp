@@ -6,6 +6,25 @@ Built for speed and developer experience, Kodu helps you get the best out of AI 
 
 ---
 
+## TLDR
+
+```bash
+# Install
+npm install -g kodu
+
+# Setup
+kodu init
+export OPENAI_API_KEY=your_key_here
+
+# Quick commands
+kodu pack --copy              # Copy project context to clipboard
+kodu clean                    # Remove comments from code
+kodu review                   # Review staged changes
+kodu commit                   # Generate commit message
+```
+
+---
+
 ## Key Features
 
 - **📦 Smart Context Packing**: Bundle your entire project (or specific parts) into a single, LLM-friendly format.
@@ -22,10 +41,10 @@ Built for speed and developer experience, Kodu helps you get the best out of AI 
 
 ```bash
 # Install globally
-npm install -g kodu-cli # (Or your package name)
+npm install -g kodu
 
 # Or run via npx
-npx kodu-cli init
+npx kodu init
 ```
 
 ### 2. Initialization
@@ -35,6 +54,7 @@ Set up Kodu in your project:
 ```bash
 kodu init
 ```
+
 This creates a `kodu.json` configuration file and a `.kodu/` folder for your custom prompt templates.
 
 ### 3. Configure AI (Optional)
@@ -58,6 +78,9 @@ kodu pack --copy --template refactor
 
 # Save context to a specific file
 kodu pack --out context.txt
+
+# Output to stdout
+kodu pack
 ```
 
 ### Clean Code
@@ -81,14 +104,26 @@ kodu review
 # Check for security vulnerabilities or style issues
 kodu review --mode security
 kodu review --mode style
+
+# CI/CD mode with JSON output
+kodu review --mode bug --json --ci --output review.json
 ```
 
 ### AI Commit Messages
 Generate a concise Conventional Commit message based on your staged diff.
 
 ```bash
+# Generate commit message
 kodu commit
+
+# Save to file
+kodu commit --output commit-message.txt
+
+# CI/CD mode
+kodu commit --ci
 ```
+
+**Note:** `kodu commit` only generates the message. You still need to run `git commit -m "$(kodu commit)"` to commit.
 
 ---
 
@@ -103,20 +138,25 @@ Example `kodu.json`:
 ```json
 {
   "llm": {
-    "model": "gpt-4o"
+    "provider": "openai",
+    "model": "gpt-4o",
+    "apiKeyEnv": "OPENAI_API_KEY"
   },
   "packer": {
     "ignore": ["*.log", "dist/**"]
   },
   "cleaner": {
-    "whitelist": ["//!"]
+    "whitelist": ["//!"],
+    "keepJSDoc": true
   }
 }
 ```
 
+---
+
 ## Why Kodu?
 
-1. **Speed**: Optimized for near-instant startup.
+1. **Speed**: Optimized for near-instant startup (< 0.5s).
 2. **Privacy & Control**: You decide exactly what code leaves your machine.
 3. **Deterministic**: Code cleaning is performed via logic, not AI, ensuring your actual code logic is never accidentally altered.
 4. **CI/CD Ready**: Use `--ci` and `--json` flags to integrate Kodu reviews into your automation pipelines.
