@@ -6,19 +6,16 @@
     "apiKeyEnv": "OPENAI_API_KEY"
   },
   "cleaner": {
-    "whitelist": ["//!"],
-    "keepJSDoc": true
+    "whitelist": [
+      "//!",
+      "qwe",
+      "ssss"
+    ],
+    "keepJSDoc": false
   },
   "packer": {
     "ignore": [
-      "package-lock.json",
-      "yarn.lock",
-      "pnpm-lock.yaml",
-      ".git",
-      ".kodu",
-      "node_modules",
-      "dist",
-      "coverage"
+      "test"
     ]
   },
   "prompts": {
