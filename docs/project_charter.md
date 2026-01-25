@@ -37,7 +37,7 @@
 ### 4.2. The Packer (Сборщик контекста)
 *   **Команда:** `kodu pack [options]`
 *   Сборка файлов проекта в один текстовый файл или буфер обмена (`--copy`).
-*   Учет `.gitignore` и `ignorePatterns` из конфига.
+*   Учет `.gitignore` и `ignorePatterns` из конфига (поведение можно отключить через `packer.useGitignore`).
 *   **Token Budgeting:** Всегда выводить количество токенов и примерную стоимость.
 *   **Prompt Templates:** Поддержка флага `--template <name>`, подстановка шаблонов из `.kodu/prompts/`.
 *   *Ограничение:* Отказ от "Smart Context" (разрешения импортов) ради универсальности.
@@ -47,6 +47,7 @@
 *   Удаление комментариев из кода.
 *   **Алгоритм:** Строго детерминированный (без AI), на базе AST (`ts-morph`).
 *   **Поддержка:** `.ts`, `.js`, `.tsx`, `.jsx`.
+*   Учет `.gitignore` можно отключить через `cleaner.useGitignore`.
 *   **Whitelist (Исключения):**
     *   *System:* `@ts-ignore`, `eslint-disable`, `prettier-ignore`, `TODO`, `FIXME`.
     *   *Biome:* Специальная поддержка `// biome-ignore ...`.
@@ -82,10 +83,12 @@
     "model": "gpt-4o"
   },
   "cleaner": {
-    "whitelist": ["//!"]
+    "whitelist": ["//!"],
+    "useGitignore": true
   },
   "packer": {
-    "ignore": ["*.lock", "coverage"]
+    "ignore": ["*.lock", "coverage"],
+    "useGitignore": true
   }
 }
 ```

@@ -8,13 +8,20 @@ import { ConfigService } from '../config/config.service';
 export class FsService {
   constructor(private readonly configService: ConfigService) {}
 
-  async findProjectFiles(): Promise<string[]> {
+  async findProjectFiles(
+    options: { ignore?: string[]; useGitignore?: boolean } = {},
+  ): Promise<string[]> {
     const { packer } = this.configService.getConfig();
-    const gitignore = await this.readGitignorePatterns();
+    const ignorePatterns = options.ignore ?? packer.ignore;
+    const shouldUseGitignore = options.useGitignore ?? packer.useGitignore;
+    const gitignore = shouldUseGitignore
+      ? await this.readGitignorePatterns()
+      : [];
+
     const entries = await glob(['**/*'], {
       onlyFiles: true,
       absolute: true,
-      ignore: [...packer.ignore, ...gitignore],
+      ignore: [...ignorePatterns, ...gitignore],
     });
 
     return entries

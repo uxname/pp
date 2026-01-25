@@ -24,7 +24,8 @@
     "cleaner": {
       "default": {
         "whitelist": ["//!"],
-        "keepJSDoc": true
+        "keepJSDoc": true,
+        "useGitignore": true
       },
       "type": "object",
       "properties": {
@@ -38,9 +39,13 @@
         "keepJSDoc": {
           "default": true,
           "type": "boolean"
+        },
+        "useGitignore": {
+          "default": true,
+          "type": "boolean"
         }
       },
-      "required": ["whitelist", "keepJSDoc"],
+      "required": ["whitelist", "keepJSDoc", "useGitignore"],
       "additionalProperties": false
     },
     "packer": {
@@ -54,7 +59,8 @@
           "node_modules",
           "dist",
           "coverage"
-        ]
+        ],
+        "useGitignore": true
       },
       "type": "object",
       "properties": {
@@ -73,9 +79,13 @@
           "items": {
             "type": "string"
           }
+        },
+        "useGitignore": {
+          "default": true,
+          "type": "boolean"
         }
       },
-      "required": ["ignore"],
+      "required": ["ignore", "useGitignore"],
       "additionalProperties": false
     },
     "prompts": {

@@ -14,6 +14,7 @@ const llmSchema = z.object({
 const cleanerSchema = z.object({
   whitelist: z.array(z.string()).default(['//!']),
   keepJSDoc: z.boolean().default(true),
+  useGitignore: z.boolean().default(true),
 });
 
 const packerSchema = z.object({
@@ -29,6 +30,7 @@ const packerSchema = z.object({
       'dist',
       'coverage',
     ]),
+  useGitignore: z.boolean().default(true),
 });
 
 const promptsSchema = z
@@ -41,7 +43,11 @@ const promptsSchema = z
 export const configSchema = z.object({
   $schema: z.string().optional(),
   llm: llmSchema.optional(),
-  cleaner: cleanerSchema.default({ whitelist: ['//!'], keepJSDoc: true }),
+  cleaner: cleanerSchema.default({
+    whitelist: ['//!'],
+    keepJSDoc: true,
+    useGitignore: true,
+  }),
   packer: packerSchema.default({
     ignore: [
       'package-lock.json',
@@ -53,6 +59,7 @@ export const configSchema = z.object({
       'dist',
       'coverage',
     ],
+    useGitignore: true,
   }),
   prompts: promptsSchema,
 });

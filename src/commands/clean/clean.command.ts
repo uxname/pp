@@ -1,4 +1,5 @@
 import { Command, CommandRunner, Option } from 'nest-commander';
+import { ConfigService } from '../../core/config/config.service';
 import { FsService } from '../../core/file-system/fs.service';
 import { UiService } from '../../core/ui/ui.service';
 import { CleanerService } from '../../shared/cleaner/cleaner.service';
@@ -13,6 +14,7 @@ export class CleanCommand extends CommandRunner {
     private readonly ui: UiService,
     private readonly fsService: FsService,
     private readonly cleaner: CleanerService,
+    private readonly config: ConfigService,
   ) {
     super();
   }
@@ -35,7 +37,10 @@ export class CleanCommand extends CommandRunner {
       .start();
 
     try {
-      const allFiles = await this.fsService.findProjectFiles();
+      const { cleaner: cleanerConfig } = this.config.getConfig();
+      const allFiles = await this.fsService.findProjectFiles({
+        useGitignore: cleanerConfig.useGitignore,
+      });
       const targets = allFiles.filter((file) =>
         /\.(ts|tsx|js|jsx)$/i.test(file),
       );

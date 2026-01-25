@@ -25,7 +25,7 @@ export class InitCommand extends CommandRunner {
     const defaultConfig: KoduConfig = {
       $schema: 'https://uxna.me/kodu/schema.json',
       llm: defaultLlmConfig,
-      cleaner: { whitelist: ['//!'], keepJSDoc: true },
+      cleaner: { whitelist: ['//!'], keepJSDoc: true, useGitignore: true },
       packer: {
         ignore: [
           'package-lock.json',
@@ -37,6 +37,7 @@ export class InitCommand extends CommandRunner {
           'dist',
           'coverage',
         ],
+        useGitignore: true,
       },
     };
 
@@ -100,8 +101,15 @@ export class InitCommand extends CommandRunner {
     const configToSave: KoduConfig = {
       $schema: defaultConfig.$schema,
       ...(llmConfig && { llm: llmConfig }),
-      cleaner: { whitelist, keepJSDoc: defaultConfig.cleaner.keepJSDoc },
-      packer: { ignore: ignoreList },
+      cleaner: {
+        whitelist,
+        keepJSDoc: defaultConfig.cleaner.keepJSDoc,
+        useGitignore: defaultConfig.cleaner.useGitignore,
+      },
+      packer: {
+        ignore: ignoreList,
+        useGitignore: defaultConfig.packer.useGitignore,
+      },
       prompts: {
         review: DEFAULT_REVIEW_PROMPTS,
         commit: DEFAULT_COMMIT_PROMPT,
