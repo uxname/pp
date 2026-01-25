@@ -31,12 +31,18 @@ export class ReviewCommand extends CommandRunner {
 
   @Option({
     flags: '-m, --mode <mode>',
-    description: 'Режим проверки: bug | style | security',
+    description: 'Режим проверки: bug | style | security | <custom-mode>',
   })
   parseMode(value: string): ReviewMode {
-    if (value === 'bug' || value === 'style' || value === 'security') {
+    const availableModes = this.ai.getAvailableReviewModes();
+
+    if (availableModes.includes(value)) {
       return value;
     }
+
+    this.ui.log.warn(
+      `Режим "${value}" не найден. Доступные режимы: ${availableModes.join(', ')}. Используется режим по умолчанию: ${DEFAULT_MODE}`,
+    );
     return DEFAULT_MODE;
   }
 

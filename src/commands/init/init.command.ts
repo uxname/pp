@@ -2,6 +2,10 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { Command, CommandRunner } from 'nest-commander';
 import { type KoduConfig } from '../../core/config/config.schema';
+import {
+  DEFAULT_COMMIT_PROMPT,
+  DEFAULT_REVIEW_PROMPTS,
+} from '../../core/config/default-prompts';
 import { UiService } from '../../core/ui/ui.service';
 
 @Command({ name: 'init', description: 'Инициализация конфигурации Kodu' })
@@ -15,7 +19,7 @@ export class InitCommand extends CommandRunner {
 
     const defaultLlmConfig = {
       provider: 'openai' as const,
-      model: 'gpt-4o',
+      model: 'gpt-5-mini',
       apiKeyEnv: 'OPENAI_API_KEY',
     };
 
@@ -79,6 +83,10 @@ export class InitCommand extends CommandRunner {
       ...(llmConfig && { llm: llmConfig }),
       cleaner: { whitelist, keepJSDoc: defaultConfig.cleaner.keepJSDoc },
       packer: { ignore: ignoreList },
+      prompts: {
+        review: DEFAULT_REVIEW_PROMPTS,
+        commit: DEFAULT_COMMIT_PROMPT,
+      },
     };
 
     await this.writeConfig(configPath, configToSave);

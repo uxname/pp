@@ -14,7 +14,7 @@
           "const": "openai"
         },
         "model": {
-          "default": "gpt-4o",
+          "default": "gpt-5-mini",
           "type": "string"
         },
         "apiKeyEnv": {
@@ -80,6 +80,24 @@
         }
       },
       "required": ["ignore"],
+      "additionalProperties": false
+    },
+    "prompts": {
+      "type": "object",
+      "properties": {
+        "review": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "commit": {
+          "type": "string"
+        }
+      },
       "additionalProperties": false
     }
   },

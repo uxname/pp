@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 const llmSchema = z.object({
   provider: z.literal('openai').default('openai'),
-  model: z.string().default('gpt-4o'),
+  model: z.string().default('gpt-5-mini'),
   apiKeyEnv: z.string().default('OPENAI_API_KEY'),
 });
 
@@ -26,6 +26,13 @@ const packerSchema = z.object({
     ]),
 });
 
+const promptsSchema = z
+  .object({
+    review: z.record(z.string(), z.string()).optional(),
+    commit: z.string().optional(),
+  })
+  .optional();
+
 export const configSchema = z.object({
   $schema: z.string().optional(),
   llm: llmSchema.optional(),
@@ -42,6 +49,7 @@ export const configSchema = z.object({
       'coverage',
     ],
   }),
+  prompts: promptsSchema,
 });
 
 export type KoduConfig = z.infer<typeof configSchema>;

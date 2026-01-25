@@ -2,8 +2,14 @@ import { Agent } from '@mastra/core/agent';
 import { Injectable } from '@nestjs/common';
 import { z } from 'zod';
 import { ConfigService } from '../../core/config/config.service';
+import {
+  DEFAULT_COMMIT_PROMPT,
+  DEFAULT_REVIEW_PROMPTS,
+  replacePromptVariables,
+  STANDARD_REVIEW_MODES,
+} from '../../core/config/default-prompts';
 
-export type ReviewMode = 'bug' | 'style' | 'security';
+export type ReviewMode = string;
 
 type ReviewIssue = {
   severity: 'low' | 'medium' | 'high';
@@ -65,19 +71,8 @@ export class AiService {
       'Generate a concise Conventional Commit message. Only output the message string.',
     );
 
-    const output = await agent.generate(
-      `
-You generate Conventional Commit messages.
-Rules:
-- Format: <type>(<optional scope>): <subject>
-- Lowercase subject, no trailing period.
-- Keep under 70 characters.
-- Summarize the diff accurately.
-
-Diff:
-${diff}
-`.trim(),
-    );
+    const prompt = this.buildCommitPrompt(diff);
+    const output = await agent.generate(prompt);
 
     const raw = output.text.trim();
     const cleaned = this.cleanCommitMessage(raw);
@@ -87,6 +82,16 @@ ${diff}
     }
 
     return cleaned;
+  }
+
+  getAvailableReviewModes(): string[] {
+    const config = this.configService.getConfig();
+    const standardModes = [...STANDARD_REVIEW_MODES];
+    const customModes = config.prompts?.review
+      ? Object.keys(config.prompts.review)
+      : [];
+
+    return Array.from(new Set([...standardModes, ...customModes]));
   }
 
   hasApiKey(): boolean {
@@ -118,21 +123,35 @@ ${diff}
   }
 
   private buildReviewPrompt(diff: string, mode: ReviewMode): string {
-    const focusByMode: Record<ReviewMode, string> = {
-      bug: 'Найди потенциальные баги, логические ошибки, регрессы.',
-      style: 'Проверь читаемость, согласованность, форматирование и нейминг.',
-      security:
-        'Найди уязвимости, утечки секретов, неправильные проверки прав.',
-    };
+    const config = this.configService.getConfig();
 
-    return `
-Ты — строгий ревьюер кода. Формат ответа: краткий markdown с пунктами.
-Режим: ${mode}. ${focusByMode[mode]}
-Дай сжатый список проблем и рекомендаций. Если критичных нет — скажи об этом.
+    const customPrompt = config.prompts?.review?.[mode];
+    if (customPrompt) {
+      return replacePromptVariables(customPrompt, { diff, mode });
+    }
 
-Diff:
-${diff}
-`.trim();
+    if (
+      STANDARD_REVIEW_MODES.includes(
+        mode as (typeof STANDARD_REVIEW_MODES)[number],
+      )
+    ) {
+      const defaultPrompt =
+        DEFAULT_REVIEW_PROMPTS[mode as keyof typeof DEFAULT_REVIEW_PROMPTS];
+      return replacePromptVariables(defaultPrompt, { diff, mode });
+    }
+
+    return replacePromptVariables(DEFAULT_REVIEW_PROMPTS.bug, { diff, mode });
+  }
+
+  private buildCommitPrompt(diff: string): string {
+    const config = this.configService.getConfig();
+    const customPrompt = config.prompts?.commit;
+
+    if (customPrompt) {
+      return replacePromptVariables(customPrompt, { diff });
+    }
+
+    return replacePromptVariables(DEFAULT_COMMIT_PROMPT, { diff });
   }
 
   private getApiKey(): string {

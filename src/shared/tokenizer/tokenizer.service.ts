@@ -8,9 +8,7 @@ type TokenEstimate = {
 };
 
 const PRICE_PER_MILLION: Record<string, number> = {
-  'gpt-4o': 2.5,
-  'gpt-4o-mini': 0.15,
-  o1: 15,
+  'gpt-5-mini': 2.5,
 };
 
 @Injectable()
@@ -29,19 +27,19 @@ export class TokenizerService {
 
   private getPricePerMillion(): number {
     const config = this.configService.getConfig();
-    const model = config.llm?.model ?? 'gpt-4o';
+    const model = config.llm?.model ?? 'gpt-5-mini';
     const key = model.toLowerCase();
     return PRICE_PER_MILLION[key] ?? 0;
   }
 
   private createEncoder() {
     const config = this.configService.getConfig();
-    const model = config.llm?.model ?? 'gpt-4o';
+    const model = config.llm?.model ?? 'gpt-5-mini';
 
     try {
       return encodingForModel(model as TiktokenModel);
     } catch {
-      return encodingForModel('gpt-4o');
+      return encodingForModel('gpt-5-mini');
     }
   }
 
