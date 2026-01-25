@@ -39,7 +39,6 @@ export class TokenizerService {
     try {
       return encodingForModel(model as TiktokenModel);
     } catch {
-      // fallback to o200k_base which covers 4o/4o-mini/o1 families
       return encodingForModel('gpt-4o');
     }
   }

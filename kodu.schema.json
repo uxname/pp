@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "llm": {
+      "default": {
+        "provider": "openai",
+        "model": "gpt-4o",
+        "apiKeyEnv": "OPENAI_API_KEY"
+      },
+      "type": "object",
+      "properties": {
+        "provider": {
+          "default": "openai",
+          "type": "string",
+          "const": "openai"
+        },
+        "model": {
+          "default": "gpt-4o",
+          "type": "string"
+        },
+        "apiKeyEnv": {
+          "default": "OPENAI_API_KEY",
+          "type": "string"
+        }
+      },
+      "required": ["provider", "model", "apiKeyEnv"],
+      "additionalProperties": false
+    },
+    "cleaner": {
+      "default": {
+        "whitelist": ["//!"],
+        "keepJSDoc": true
+      },
+      "type": "object",
+      "properties": {
+        "whitelist": {
+          "default": ["//!"],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "keepJSDoc": {
+          "default": true,
+          "type": "boolean"
+        }
+      },
+      "required": ["whitelist", "keepJSDoc"],
+      "additionalProperties": false
+    },
+    "packer": {
+      "default": {
+        "ignore": [
+          "package-lock.json",
+          "yarn.lock",
+          "pnpm-lock.yaml",
+          ".git",
+          ".kodu",
+          "node_modules",
+          "dist",
+          "coverage"
+        ]
+      },
+      "type": "object",
+      "properties": {
+        "ignore": {
+          "default": [
+            "package-lock.json",
+            "yarn.lock",
+            "pnpm-lock.yaml",
+            ".git",
+            ".kodu",
+            "node_modules",
+            "dist",
+            "coverage"
+          ],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["ignore"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["llm", "cleaner", "packer"],
+  "additionalProperties": false
+}

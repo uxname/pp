@@ -14,6 +14,7 @@ export class InitCommand extends CommandRunner {
     const configPath = path.join(process.cwd(), 'kodu.json');
 
     const defaultConfig: KoduConfig = {
+      $schema: 'https://uxna.me/kodu/schema.json',
       llm: { provider: 'openai', model: 'gpt-4o', apiKeyEnv: 'OPENAI_API_KEY' },
       cleaner: { whitelist: ['//!'], keepJSDoc: true },
       packer: {
@@ -55,6 +56,7 @@ export class InitCommand extends CommandRunner {
     );
 
     const configToSave: KoduConfig = {
+      $schema: defaultConfig.$schema,
       llm: {
         provider,
         model: defaultConfig.llm.model,

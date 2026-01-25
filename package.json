@@ -4,11 +4,13 @@
   "private": false,
   "license": "UNLICENSED",
   "bin": {
-    "kodu": "dist/main.js"
+    "kodu": "dist/src/main.js"
   },
   "scripts": {
     "________________ BUILD AND RUN ________________": "",
-    "build": "nest build && chmod +x dist/main.js",
+    "build": "nest build && chmod +x dist/src/main.js",
+    "generate:schema": "ts-node scripts/generate-json-schema.ts",
+    "postbuild": "npm run generate:schema",
     "start:prod": "node dist/main.js",
     "new:command": "nest g -c nest-commander-schematics command",
     "new:question": "nest g -c nest-commander-schematics question",

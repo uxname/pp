@@ -27,6 +27,7 @@ const packerSchema = z.object({
 });
 
 export const configSchema = z.object({
+  $schema: z.string().optional(),
   llm: llmSchema.default({
     provider: 'openai',
     model: 'gpt-4o',
