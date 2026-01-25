@@ -102,6 +102,9 @@
         },
         "commit": {
           "type": "string"
+        },
+        "pack": {
+          "type": "string"
         }
       },
       "additionalProperties": false

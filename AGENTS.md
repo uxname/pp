@@ -166,7 +166,6 @@ Kodu supports 72+ providers through Mastra's model router:
 ### 7.1. `kodu init`
 - Interactive setup wizard for creating `kodu.json`.
 - Creates `.kodu/` directory for prompt templates.
-- Updates `.gitignore` to exclude `.kodu/`.
 
 ### 7.2. `kodu pack [options]`
 - Bundles project files into a single text file or clipboard.

@@ -55,7 +55,7 @@ Set up Kodu in your project:
 kodu init
 ```
 
-This creates a `kodu.json` configuration file and a `.kodu/` folder for your custom prompt templates.
+This creates a `kodu.json` configuration file and a `.kodu/prompts/` folder for your custom prompt templates.
 
 ### 3. Configure AI (Optional)
 
@@ -158,19 +158,20 @@ Example `kodu.json`:
   },
   "prompts": {
     "review": {
-      "bug": "Ты — строгий ревьюер кода...\n\nDiff:\n{diff}",
-      "style": "Проверь читаемость...\n\nDiff:\n{diff}",
-      "security": "Найди уязвимости...\n\nDiff:\n{diff}",
-      "performance": "Проверь производительность кода...\n\nDiff:\n{diff}"
+      "bug": ".kodu/prompts/review-bug.md",
+      "style": ".kodu/prompts/review-style.md",
+      "security": ".kodu/prompts/review-security.md"
     },
-    "commit": "You generate Conventional Commit messages...\n\nDiff:\n{diff}"
+    "commit": ".kodu/prompts/commit.md",
+    "pack": ".kodu/prompts/pack.md"
   }
 }
 ```
 
 **Prompts:**
-- `prompts.review`: Custom prompts for review modes. Supports standard modes (`bug`, `style`, `security`) and custom modes. Use `{diff}` and `{mode}` variables.
-- `prompts.commit`: Custom prompt for commit message generation. Use `{diff}` variable.
+- `prompts.review`: Paths to prompt files for review modes. Supports standard modes (`bug`, `style`, `security`) and custom modes. Use `{diff}` and `{mode}` variables inside files.
+- `prompts.commit`: Path to prompt file for commit message generation. Use `{diff}` variable.
+- `prompts.pack`: Path to prompt file applied by default in `kodu pack`. Supports `{{context}}`, `{{fileList}}`, `{{tokenCount}}`, `{{usdEstimate}}` placeholders.
 
 ---
 

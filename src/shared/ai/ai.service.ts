@@ -7,12 +7,16 @@ import {
   replacePromptVariables,
   STANDARD_REVIEW_MODES,
 } from '../../core/config/default-prompts';
+import { PromptService } from '../../core/config/prompt.service';
 
 export type ReviewMode = string;
 
 @Injectable()
 export class AiService {
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly promptService: PromptService,
+  ) {}
 
   async reviewDiff(diff: string, mode: ReviewMode): Promise<{ text: string }> {
     const agent = this.createAgent(
@@ -20,7 +24,7 @@ export class AiService {
       'AI Reviewer for staged git diff. Be concise.',
     );
 
-    const userPrompt = this.buildReviewPrompt(diff, mode);
+    const userPrompt = await this.buildReviewPrompt(diff, mode);
 
     const output = await agent.generate(userPrompt);
     return { text: output.text.trim() };
@@ -32,7 +36,7 @@ export class AiService {
       'Generate a concise Conventional Commit message. Only output the message string.',
     );
 
-    const prompt = this.buildCommitPrompt(diff);
+    const prompt = await this.buildCommitPrompt(diff);
     const output = await agent.generate(prompt);
 
     const raw = output.text.trim();
@@ -86,12 +90,15 @@ export class AiService {
     });
   }
 
-  private buildReviewPrompt(diff: string, mode: ReviewMode): string {
+  private async buildReviewPrompt(
+    diff: string,
+    mode: ReviewMode,
+  ): Promise<string> {
     const config = this.configService.getConfig();
 
     const customPrompt = config.prompts?.review?.[mode];
     if (customPrompt) {
-      return replacePromptVariables(customPrompt, { diff, mode });
+      return this.promptService.load(customPrompt, { diff, mode });
     }
 
     if (
@@ -107,12 +114,12 @@ export class AiService {
     return replacePromptVariables(DEFAULT_REVIEW_PROMPTS.bug, { diff, mode });
   }
 
-  private buildCommitPrompt(diff: string): string {
+  private async buildCommitPrompt(diff: string): Promise<string> {
     const config = this.configService.getConfig();
     const customPrompt = config.prompts?.commit;
 
     if (customPrompt) {
-      return replacePromptVariables(customPrompt, { diff });
+      return this.promptService.load(customPrompt, { diff });
     }
 
     return replacePromptVariables(DEFAULT_COMMIT_PROMPT, { diff });

@@ -6,17 +6,29 @@
   },
   "cleaner": {
     "whitelist": ["//!"],
-    "keepJSDoc": true
+    "keepJSDoc": true,
+    "useGitignore": true
   },
   "packer": {
-    "ignore": ["test"]
+    "ignore": [
+      "package-lock.json",
+      "yarn.lock",
+      "pnpm-lock.yaml",
+      ".git",
+      ".kodu",
+      "node_modules",
+      "dist",
+      "coverage"
+    ],
+    "useGitignore": true
   },
   "prompts": {
     "review": {
-      "bug": "Ты — строгий ревьюер кода. Формат ответа: краткий markdown с пунктами.\nРежим: {mode}. Найди потенциальные баги, логические ошибки, регрессы.\nДай сжатый список проблем и рекомендаций. Если критичных нет — скажи об этом.\n\nDiff:\n{diff}",
-      "style": "Ты — строгий ревьюер кода. Формат ответа: краткий markdown с пунктами.\nРежим: {mode}. Проверь читаемость, согласованность, форматирование и нейминг.\nДай сжатый список проблем и рекомендаций. Если критичных нет — скажи об этом.\n\nDiff:\n{diff}",
-      "security": "Ты — строгий ревьюер кода. Формат ответа: краткий markdown с пунктами.\nРежим: {mode}. Найди уязвимости, утечки секретов, неправильные проверки прав.\nДай сжатый список проблем и рекомендаций. Если критичных нет — скажи об этом.\n\nDiff:\n{diff}"
+      "bug": ".kodu/prompts/review-bug.md",
+      "style": ".kodu/prompts/review-style.md",
+      "security": ".kodu/prompts/review-security.md"
     },
-    "commit": "You generate Conventional Commit messages.\nRules:\n- Format: <type>(<optional scope>): <subject>\n- Lowercase subject, no trailing period.\n- Keep under 70 characters.\n- Summarize the diff accurately.\n\nDiff:\n{diff}"
+    "commit": ".kodu/prompts/commit.md",
+    "pack": ".kodu/prompts/pack.md"
   }
 }

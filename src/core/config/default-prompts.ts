@@ -31,6 +31,14 @@ Rules:
 Diff:
 {diff}`;
 
+export const DEFAULT_PACK_PROMPT = `Project context below. Keep instructions concise.
+
+Files packed ({{tokenCount}} tokens, ~{{usdEstimate}}):
+{{fileList}}
+
+Context:
+{{context}}`;
+
 export const STANDARD_REVIEW_MODES = ['bug', 'style', 'security'] as const;
 
 export function replacePromptVariables(

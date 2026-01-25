@@ -4,6 +4,7 @@ import { Command, CommandRunner } from 'nest-commander';
 import { type KoduConfig } from '../../core/config/config.schema';
 import {
   DEFAULT_COMMIT_PROMPT,
+  DEFAULT_PACK_PROMPT,
   DEFAULT_REVIEW_PROMPTS,
 } from '../../core/config/default-prompts';
 import { UiService } from '../../core/ui/ui.service';
@@ -98,6 +99,8 @@ export class InitCommand extends CommandRunner {
       additionalWhitelist,
     );
 
+    const promptPaths = this.buildPromptPaths();
+
     const configToSave: KoduConfig = {
       $schema: defaultConfig.$schema,
       ...(llmConfig && { llm: llmConfig }),
@@ -111,13 +114,18 @@ export class InitCommand extends CommandRunner {
         useGitignore: defaultConfig.packer.useGitignore,
       },
       prompts: {
-        review: DEFAULT_REVIEW_PROMPTS,
-        commit: DEFAULT_COMMIT_PROMPT,
+        review: {
+          bug: promptPaths.review.bug,
+          style: promptPaths.review.style,
+          security: promptPaths.review.security,
+        },
+        commit: promptPaths.commit,
+        pack: promptPaths.pack,
       },
     };
 
     await this.writeConfig(configPath, configToSave);
-    await this.ensureKoduFolders();
+    await this.ensurePromptFiles(promptPaths);
     await this.ensureGitignore();
 
     this.ui.log.success('Конфигурация Kodu создана.');
@@ -202,16 +210,58 @@ export class InitCommand extends CommandRunner {
     this.ui.log.success(`Сохранен ${configPath}`);
   }
 
-  private async ensureKoduFolders(): Promise<void> {
-    const koduDir = path.join(process.cwd(), '.kodu');
-    const promptsDir = path.join(koduDir, 'prompts');
+  private async ensurePromptFiles(
+    paths: ReturnType<InitCommand['buildPromptPaths']>,
+  ): Promise<void> {
+    const promptDir = path.join(process.cwd(), '.kodu', 'prompts');
+    await fs.mkdir(promptDir, { recursive: true });
 
-    await fs.mkdir(promptsDir, { recursive: true });
-
-    const keepFile = path.join(promptsDir, '.keep');
+    const keepFile = path.join(promptDir, '.keep');
     if (!(await this.fileExists(keepFile))) {
       await fs.writeFile(keepFile, '');
     }
+
+    await Promise.all([
+      this.writePromptIfMissing(paths.review.bug, DEFAULT_REVIEW_PROMPTS.bug),
+      this.writePromptIfMissing(
+        paths.review.style,
+        DEFAULT_REVIEW_PROMPTS.style,
+      ),
+      this.writePromptIfMissing(
+        paths.review.security,
+        DEFAULT_REVIEW_PROMPTS.security,
+      ),
+      this.writePromptIfMissing(paths.commit, DEFAULT_COMMIT_PROMPT),
+      this.writePromptIfMissing(paths.pack, DEFAULT_PACK_PROMPT),
+    ]);
+  }
+
+  private buildPromptPaths() {
+    return {
+      review: {
+        bug: path.posix.join('.kodu', 'prompts', 'review-bug.md'),
+        style: path.posix.join('.kodu', 'prompts', 'review-style.md'),
+        security: path.posix.join('.kodu', 'prompts', 'review-security.md'),
+      },
+      commit: path.posix.join('.kodu', 'prompts', 'commit.md'),
+      pack: path.posix.join('.kodu', 'prompts', 'pack.md'),
+    } as const;
+  }
+
+  private async writePromptIfMissing(
+    target: string,
+    content: string,
+  ): Promise<void> {
+    const absolute = path.isAbsolute(target)
+      ? target
+      : path.join(process.cwd(), target);
+
+    if (await this.fileExists(absolute)) {
+      return;
+    }
+
+    await fs.mkdir(path.dirname(absolute), { recursive: true });
+    await fs.writeFile(absolute, `${content}\n`, 'utf8');
   }
 
   private async ensureGitignore(): Promise<void> {
@@ -222,12 +272,6 @@ export class InitCommand extends CommandRunner {
 
     const lines = content.split(/\r?\n/);
     const additions: string[] = [];
-
-    if (
-      !lines.some((line) => line.trim() === '.kodu' || line.trim() === '.kodu/')
-    ) {
-      additions.push('.kodu/');
-    }
 
     if (!lines.some((line) => line.trim() === '.env')) {
       const addEnv = await this.ui.promptConfirm({

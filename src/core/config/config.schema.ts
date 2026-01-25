@@ -33,10 +33,13 @@ const packerSchema = z.object({
   useGitignore: z.boolean().default(true),
 });
 
+const promptSourceSchema = z.string();
+
 const promptsSchema = z
   .object({
-    review: z.record(z.string(), z.string()).optional(),
-    commit: z.string().optional(),
+    review: z.record(z.string(), promptSourceSchema).optional(),
+    commit: promptSourceSchema.optional(),
+    pack: promptSourceSchema.optional(),
   })
   .optional();
 

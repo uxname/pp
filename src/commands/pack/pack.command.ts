@@ -2,6 +2,8 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import clipboard from 'clipboardy';
 import { Command, CommandRunner, Option } from 'nest-commander';
+import { ConfigService } from '../../core/config/config.service';
+import { PromptService } from '../../core/config/prompt.service';
 import { FsService } from '../../core/file-system/fs.service';
 import { UiService } from '../../core/ui/ui.service';
 import { TokenizerService } from '../../shared/tokenizer/tokenizer.service';
@@ -23,6 +25,8 @@ type TemplateContext = {
 export class PackCommand extends CommandRunner {
   constructor(
     private readonly ui: UiService,
+    private readonly configService: ConfigService,
+    private readonly promptService: PromptService,
     private readonly fsService: FsService,
     private readonly tokenizer: TokenizerService,
   ) {
@@ -66,6 +70,13 @@ export class PackCommand extends CommandRunner {
       const fileList = files.join('\n');
       const { tokens, usdEstimate } = this.tokenizer.count(context);
 
+      const basePrompt = await this.applyConfiguredPrompt({
+        context,
+        fileList,
+        tokenCount: tokens,
+        usdEstimate,
+      });
+
       const templateApplied = options.template
         ? await this.applyTemplate(options.template, {
             context,
@@ -73,7 +84,7 @@ export class PackCommand extends CommandRunner {
             tokenCount: tokens,
             usdEstimate,
           })
-        : context;
+        : basePrompt;
 
       const outputPath = await this.writeOutput(templateApplied, options.out);
 
@@ -115,34 +126,11 @@ export class PackCommand extends CommandRunner {
     ctx: TemplateContext,
   ): Promise<string> {
     const template = await this.loadTemplate(name);
-    const filled = template
-      .replace(/\{\{context\}\}/g, ctx.context)
-      .replace(/\{\{fileList\}\}/g, ctx.fileList)
-      .replace(/\{\{tokenCount\}\}/g, ctx.tokenCount.toString())
-      .replace(/\{\{usdEstimate\}\}/g, ctx.usdEstimate.toFixed(4));
-
-    if (!template.includes('{{context}}')) {
-      return `${filled}\n\n${ctx.context}`;
-    }
-
-    return filled;
+    return this.fillTemplate(template, ctx);
   }
 
   private async loadTemplate(name: string): Promise<string> {
-    const base = path.join(process.cwd(), '.kodu', 'prompts', name);
-    const candidates = [`${base}.md`, `${base}.txt`];
-
-    for (const candidate of candidates) {
-      if (await this.fileExists(candidate)) {
-        return fs.readFile(candidate, 'utf8');
-      }
-    }
-
-    throw new Error(
-      `Шаблон ${name} не найден. Ожидались файлы: ${candidates
-        .map((c) => path.relative(process.cwd(), c))
-        .join(', ')}`,
-    );
+    return this.promptService.loadFromPromptsDir(name);
   }
 
   private async writeOutput(
@@ -156,12 +144,29 @@ export class PackCommand extends CommandRunner {
     return target;
   }
 
-  private async fileExists(filePath: string): Promise<boolean> {
-    try {
-      await fs.access(filePath);
-      return true;
-    } catch {
-      return false;
+  private async applyConfiguredPrompt(ctx: TemplateContext): Promise<string> {
+    const config = this.configService.getConfig();
+    const packPrompt = config.prompts?.pack;
+
+    if (!packPrompt) {
+      return ctx.context;
     }
+
+    const template = await this.promptService.load(packPrompt);
+    return this.fillTemplate(template, ctx);
+  }
+
+  private fillTemplate(template: string, ctx: TemplateContext): string {
+    const filled = template
+      .replace(/\{\{context\}\}/g, ctx.context)
+      .replace(/\{\{fileList\}\}/g, ctx.fileList)
+      .replace(/\{\{tokenCount\}\}/g, ctx.tokenCount.toString())
+      .replace(/\{\{usdEstimate\}\}/g, ctx.usdEstimate.toFixed(4));
+
+    if (!template.includes('{{context}}')) {
+      return `${filled}\n\n${ctx.context}`;
+    }
+
+    return filled;
   }
 }
