@@ -6,9 +6,7 @@
     "apiKeyEnv": "OPENAI_API_KEY"
   },
   "cleaner": {
-    "whitelist": [
-      "//!"
-    ],
+    "whitelist": ["//!"],
     "keepJSDoc": true
   },
   "packer": {
