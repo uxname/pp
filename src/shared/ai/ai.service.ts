@@ -11,6 +11,13 @@ import { PromptService } from '../../core/config/prompt.service';
 
 export type ReviewMode = string;
 
+const DEFAULT_COMMIT_MAX_OUTPUT_TOKENS = 150;
+const DEFAULT_REVIEW_MAX_OUTPUT_TOKENS = 5000;
+
+type ModelSettings = Record<string, unknown> & {
+  maxOutputTokens?: number;
+};
+
 @Injectable()
 export class AiService {
   constructor(
@@ -26,7 +33,8 @@ export class AiService {
 
     const userPrompt = await this.buildReviewPrompt(diff, mode);
 
-    const output = await agent.generate(userPrompt);
+    const modelSettings = this.getModelSettingsForCommand('review');
+    const output = await agent.generate(userPrompt, { modelSettings });
     return { text: output.text.trim() };
   }
 
@@ -37,7 +45,8 @@ export class AiService {
     );
 
     const prompt = await this.buildCommitPrompt(diff);
-    const output = await agent.generate(prompt);
+    const modelSettings = this.getModelSettingsForCommand('commit');
+    const output = await agent.generate(prompt, { modelSettings });
 
     const raw = output.text.trim();
     const cleaned = this.cleanCommitMessage(raw);
@@ -159,6 +168,34 @@ export class AiService {
     }
 
     return model;
+  }
+
+  private getModelSettingsForCommand(
+    command: 'commit' | 'review',
+  ): ModelSettings {
+    const config = this.configService.getConfig();
+    const commands = config.llm?.commands;
+    const defaultMax =
+      command === 'commit'
+        ? DEFAULT_COMMIT_MAX_OUTPUT_TOKENS
+        : DEFAULT_REVIEW_MAX_OUTPUT_TOKENS;
+    const base: ModelSettings = { maxOutputTokens: defaultMax };
+
+    if (!commands) {
+      return base;
+    }
+
+    const override = commands[command];
+    const settings = override?.modelSettings as ModelSettings | undefined;
+
+    if (!settings) {
+      return base;
+    }
+
+    return {
+      ...settings,
+      maxOutputTokens: settings.maxOutputTokens ?? defaultMax,
+    };
   }
 
   private cleanCommitMessage(text: string): string {

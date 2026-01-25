@@ -9,6 +9,11 @@ import {
 } from '../../core/config/default-prompts';
 import { UiService } from '../../core/ui/ui.service';
 
+const buildDefaultCommandSettings = () => ({
+  commit: { modelSettings: { maxOutputTokens: 150 } },
+  review: { modelSettings: { maxOutputTokens: 5000 } },
+});
+
 @Command({ name: 'init', description: 'Инициализация конфигурации Kodu' })
 export class InitCommand extends CommandRunner {
   constructor(private readonly ui: UiService) {
@@ -76,6 +81,7 @@ export class InitCommand extends CommandRunner {
       llmConfig = {
         model,
         apiKeyEnv: defaultLlmConfig.apiKeyEnv,
+        commands: buildDefaultCommandSettings(),
       };
     }
 

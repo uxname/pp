@@ -6,9 +6,32 @@ const modelIdSchema = z.string().regex(/^[a-zA-Z0-9-_]+\/[a-zA-Z0-9-_.]+$/, {
     "Model must be in format 'provider/model-name' (e.g., 'openai/gpt-4o')",
 });
 
+const llmCommandSettingsSchema = z
+  .object({
+    maxOutputTokens: z.number().int().positive().optional(),
+  })
+  .passthrough();
+
+const llmCommandSchema = z.object({
+  modelSettings: llmCommandSettingsSchema.optional(),
+});
+
+const createDefaultCommandSettings = () => ({
+  commit: { modelSettings: { maxOutputTokens: 150 } },
+  review: { modelSettings: { maxOutputTokens: 5000 } },
+});
+
+const llmCommandsSchema = z
+  .object({
+    commit: llmCommandSchema.optional(),
+    review: llmCommandSchema.optional(),
+  })
+  .default(() => createDefaultCommandSettings());
+
 const llmSchema = z.object({
   model: modelIdSchema.default('openai/gpt-5-mini'),
   apiKeyEnv: z.string().default('OPENAI_API_KEY'),
+  commands: llmCommandsSchema.optional(),
 });
 
 const cleanerSchema = z.object({
