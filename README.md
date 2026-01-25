@@ -105,9 +105,15 @@ kodu review
 kodu review --mode security
 kodu review --mode style
 
+# Custom review modes (if added to kodu.json)
+kodu review --mode performance
+kodu review --mode accessibility
+
 # CI/CD mode with JSON output
 kodu review --mode bug --json --ci --output review.json
 ```
+
+Standard modes (`bug`, `style`, `security`) are always available. Custom modes require configuration in `prompts.review` section of `kodu.json`.
 
 ### AI Commit Messages
 Generate a concise Conventional Commit message based on your staged diff.
@@ -133,6 +139,7 @@ Kodu is controlled by `kodu.json`. You can customize:
 - **LLM Settings**: Choose your model (e.g., `gpt-4o`) and provider.
 - **Ignored Patterns**: Files that should never be sent to the AI (e.g., lockfiles, binaries).
 - **Cleaner Whitelist**: Specific comment prefixes you want to keep.
+- **AI Prompts**: Customize prompts for review and commit commands, including custom review modes.
 
 Example `kodu.json`:
 ```json
@@ -148,9 +155,22 @@ Example `kodu.json`:
   "cleaner": {
     "whitelist": ["//!"],
     "keepJSDoc": true
+  },
+  "prompts": {
+    "review": {
+      "bug": "Ты — строгий ревьюер кода...\n\nDiff:\n{diff}",
+      "style": "Проверь читаемость...\n\nDiff:\n{diff}",
+      "security": "Найди уязвимости...\n\nDiff:\n{diff}",
+      "performance": "Проверь производительность кода...\n\nDiff:\n{diff}"
+    },
+    "commit": "You generate Conventional Commit messages...\n\nDiff:\n{diff}"
   }
 }
 ```
+
+**Prompts:**
+- `prompts.review`: Custom prompts for review modes. Supports standard modes (`bug`, `style`, `security`) and custom modes. Use `{diff}` and `{mode}` variables.
+- `prompts.commit`: Custom prompt for commit message generation. Use `{diff}` variable.
 
 ---
 

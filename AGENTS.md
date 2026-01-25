@@ -117,6 +117,15 @@ Configuration structure:
       "dist",
       "coverage"
     ]
+  },
+  "prompts": {
+    "review": {
+      "bug": "Ты — строгий ревьюер кода...\n\nDiff:\n{diff}",
+      "style": "Проверь читаемость...\n\nDiff:\n{diff}",
+      "security": "Найди уязвимости...\n\nDiff:\n{diff}",
+      "performance": "Проверь производительность...\n\nDiff:\n{diff}"
+    },
+    "commit": "You generate Conventional Commit messages...\n\nDiff:\n{diff}"
   }
 }
 ```
@@ -128,6 +137,8 @@ Configuration structure:
 - `cleaner.whitelist`: Array of comment prefixes to preserve (e.g., `["//!"]`).
 - `cleaner.keepJSDoc`: Whether to preserve JSDoc comments `/** ... */` (default: `true`).
 - `packer.ignore`: Array of file/folder patterns to exclude from packing.
+- `prompts.review`: Record<string, string> - Prompts for review modes. Keys are mode names (standard: `bug`, `style`, `security`; custom modes can be added). Supports variables `{diff}` and `{mode}`. Standard modes always available with defaults if not specified.
+- `prompts.commit`: string - Prompt for commit message generation. Supports variable `{diff}`. Uses default if not specified.
 
 **Cleaner Whitelist Behavior:**
 - *System:* Automatically preserved: `@ts-ignore`, `@ts-expect-error`, `eslint-disable`, `prettier-ignore`, `biome-ignore`, `TODO`, `FIXME`.
@@ -166,7 +177,7 @@ Configuration structure:
 ### 7.4. `kodu review [options]`
 - Analyzes staged git diff via AI.
 - Options:
-  - `--mode <mode>`: Review mode - `bug` (default), `style`, or `security`.
+  - `--mode <mode>`: Review mode - `bug` (default), `style`, `security`, or custom mode from `prompts.review`. Standard modes (`bug`, `style`, `security`) are always available. Custom modes require configuration in `prompts.review` section of `kodu.json`.
   - `--json`: Output structured JSON report.
   - `--ci`: CI/CD mode (no spinners, no buffering).
   - `--output <file>`: Save output to file.
