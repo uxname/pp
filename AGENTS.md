@@ -178,10 +178,8 @@ Configuration structure:
 - Analyzes staged git diff via AI.
 - Options:
   - `--mode <mode>`: Review mode - `bug` (default), `style`, `security`, or custom mode from `prompts.review`. Standard modes (`bug`, `style`, `security`) are always available. Custom modes require configuration in `prompts.review` section of `kodu.json`.
-  - `--json`: Output structured JSON report.
   - `--ci`: CI/CD mode (no spinners, no buffering).
   - `--output <file>`: Save output to file.
-- Exits with code `1` if issues found in structured mode.
 - Requires: Git repository, staged changes, API key.
 
 ### 7.5. `kodu commit [options]`

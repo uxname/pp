@@ -110,7 +110,7 @@ kodu review --mode performance
 kodu review --mode accessibility
 
 # CI/CD mode with JSON output
-kodu review --mode bug --json --ci --output review.json
+kodu review --mode bug --ci --output review.txt
 ```
 
 Standard modes (`bug`, `style`, `security`) are always available. Custom modes require configuration in `prompts.review` section of `kodu.json`.
@@ -179,7 +179,7 @@ Example `kodu.json`:
 1. **Speed**: Optimized for near-instant startup (< 0.5s).
 2. **Privacy & Control**: You decide exactly what code leaves your machine.
 3. **Deterministic**: Code cleaning is performed via logic, not AI, ensuring your actual code logic is never accidentally altered.
-4. **CI/CD Ready**: Use `--ci` and `--json` flags to integrate Kodu reviews into your automation pipelines.
+4. **CI/CD Ready**: Use `--ci` flag to integrate Kodu reviews into your automation pipelines.
 
 ---
 

@@ -145,7 +145,7 @@ export class ReviewCommand extends CommandRunner {
 
       logProgress('Запрос к AI...');
       const mode = options.mode ?? DEFAULT_MODE;
-      const result = await this.ai.reviewDiff(diff, mode, false);
+      const result = await this.ai.reviewDiff(diff, mode);
 
       finishProgress('Ревью готово');
 

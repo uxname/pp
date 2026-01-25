@@ -1,6 +1,5 @@
 import { Agent } from '@mastra/core/agent';
 import { Injectable } from '@nestjs/common';
-import { z } from 'zod';
 import { ConfigService } from '../../core/config/config.service';
 import {
   DEFAULT_COMMIT_PROMPT,
@@ -11,55 +10,17 @@ import {
 
 export type ReviewMode = string;
 
-type ReviewIssue = {
-  severity: 'low' | 'medium' | 'high';
-  file?: string;
-  line?: number;
-  message: string;
-};
-
-export type ReviewResult = {
-  summary: string;
-  issues: ReviewIssue[];
-};
-
 @Injectable()
 export class AiService {
   constructor(private readonly configService: ConfigService) {}
 
-  async reviewDiff(
-    diff: string,
-    mode: ReviewMode,
-    structured: boolean,
-  ): Promise<{ text: string; structured?: ReviewResult }> {
+  async reviewDiff(diff: string, mode: ReviewMode): Promise<{ text: string }> {
     const agent = this.createAgent(
       'kodu-review-agent',
       'AI Reviewer for staged git diff. Be concise.',
     );
 
     const userPrompt = this.buildReviewPrompt(diff, mode);
-
-    if (structured) {
-      const schema = z.object({
-        summary: z.string(),
-        issues: z
-          .array(
-            z.object({
-              severity: z.enum(['low', 'medium', 'high']).default('low'),
-              file: z.string().optional(),
-              line: z.number().int().positive().optional(),
-              message: z.string(),
-            }),
-          )
-          .default([]),
-      });
-
-      const output = await agent.generate(userPrompt, {
-        structuredOutput: { schema },
-      });
-
-      return { text: output.text.trim(), structured: output.object };
-    }
 
     const output = await agent.generate(userPrompt);
     return { text: output.text.trim() };

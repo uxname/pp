@@ -55,15 +55,14 @@
 ### 4.4. AI Features (Mastra Integration)
 *   **Команда:** `kodu review`
     *   Анализ `git diff` через AI с режимами Security, Style, Bug hunting.
-    *   Поддержка CI/CD: `--ci` отключает спиннеры/буфер, `--output` сохраняет JSON/text, `--json` снимает структурированный отчет.
-    *   Команда выходит с `1`, когда AI находит проблемы в структурированном режиме.
+    *   Поддержка CI/CD: `--ci` отключает спиннеры/буфер, `--output` сохраняет text.
 *   **Команда:** `kodu commit`
     *   Генерация сообщения коммита на основе `staged` изменений с методикой Conventional Commits.
     *   Выводит результат в `stdout`, поддерживает `--output` и `--ci`, сама не выполняет `git commit`.
 
 ### Быстрый старт AI
 *   Установите ключ: `export OPENAI_API_KEY=<ключ>` (имя переменной настраивается через `llm.apiKeyEnv`).
-*   Ревью: `kodu review --mode bug|style|security [--json] [--ci] [--output review.json]`.
+*   Ревью: `kodu review --mode bug|style|security [--ci] [--output review.txt]`.
 *   Коммит: `kodu commit [--ci] [--output commit-message.txt]` (просто выводит сообщение).
 *   В git diff автоматически исключаются файлы из `packer.ignore` (например, lock-файлы и `dist/`).
 
