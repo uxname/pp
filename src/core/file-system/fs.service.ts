@@ -12,16 +12,19 @@ export class FsService {
     options: { ignore?: string[]; useGitignore?: boolean } = {},
   ): Promise<string[]> {
     const { packer } = this.configService.getConfig();
-    const ignorePatterns = options.ignore ?? packer.ignore;
     const shouldUseGitignore = options.useGitignore ?? packer.useGitignore;
     const gitignore = shouldUseGitignore
       ? await this.readGitignorePatterns()
       : [];
+    const ignorePatterns = this.normalizeIgnorePatterns([
+      ...(options.ignore ?? packer.ignore),
+      ...gitignore,
+    ]);
 
     const entries = await glob(['**/*'], {
       onlyFiles: true,
       absolute: true,
-      ignore: [...ignorePatterns, ...gitignore],
+      ignore: ignorePatterns,
     });
 
     return entries
@@ -47,5 +50,63 @@ export class FsService {
     } catch {
       return [];
     }
+  }
+
+  private normalizeIgnorePatterns(patterns: string[]): string[] {
+    const result: string[] = [];
+
+    for (const raw of patterns) {
+      const trimmed = raw.trim();
+
+      if (!trimmed || trimmed.startsWith('#')) {
+        continue;
+      }
+
+      if (trimmed.startsWith('!')) {
+        // tinyglobby ignore list does not support re-includes
+        continue;
+      }
+
+      const expanded = this.expandIgnorePattern(trimmed);
+      result.push(...expanded);
+    }
+
+    return Array.from(new Set(result));
+  }
+
+  private expandIgnorePattern(pattern: string): string[] {
+    const withoutBang = pattern.replace(/^!/, '');
+    const normalized = withoutBang.replace(/^\/+/g, '');
+
+    if (!normalized) {
+      return [];
+    }
+
+    const isDirectory = normalized.endsWith('/');
+    const base = isDirectory ? normalized.slice(0, -1) : normalized;
+    const hasGlob = /[*?[{]/.test(base);
+    const segments = base.split('/');
+
+    if (isDirectory) {
+      return [`${base}/**`, `**/${base}/**`];
+    }
+
+    if (!hasGlob && segments.length === 1) {
+      if (base.includes('.')) {
+        return [`**/${base}`];
+      }
+
+      return [`**/${base}`, `${base}/**`, `**/${base}/**`];
+    }
+
+    if (!hasGlob) {
+      return [base, `**/${base}`, `${base}/**`];
+    }
+
+    if (!base.startsWith('**/')) {
+      return [`**/${base}`];
+    }
+
+    return [base];
   }
 }
