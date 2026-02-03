@@ -63,7 +63,9 @@ export class PackCommand extends CommandRunner {
       .start();
 
     try {
-      const files = await this.fsService.findProjectFiles();
+      const files = await this.fsService.findProjectFiles({
+        excludeBinary: true,
+      });
 
       if (files.length === 0) {
         spinner.stop('No files to pack.');
