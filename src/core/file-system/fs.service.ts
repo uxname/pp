@@ -1,5 +1,4 @@
-import type { Stats } from 'node:fs';
-import { promises as fs } from 'node:fs';
+import { promises as fs, type Stats } from 'node:fs';
 import path from 'node:path';
 import { Injectable } from '@nestjs/common';
 import ignore from 'ignore';
@@ -36,27 +35,29 @@ export class FsService {
     const { packer } = this.configService.getConfig();
     const shouldUseGitignore = options.useGitignore ?? packer.useGitignore;
     const gitignorePatterns = shouldUseGitignore
-      ? await this.readGitignorePatterns()
+      ? await this.readIgnoreFile('.gitignore')
       : [];
+    const koduignorePatterns = await this.readIgnoreFile('.koduignore');
+
+    const baseIgnore = options.ignore ?? packer.ignore ?? [];
+    const normalizedBase = this.normalizeIgnorePatterns(baseIgnore);
+    const combinedIgnore = [
+      ...normalizedBase,
+      ...gitignorePatterns,
+      ...koduignorePatterns,
+    ].map((pattern) => pattern.replace(/\\/g, '/'));
 
     const ig = ignore();
-    const rawIgnorePatterns = options.ignore ?? packer.ignore ?? [];
-    const ignorePatterns = rawIgnorePatterns
-      .map((pattern) => pattern.trim())
-      .filter((pattern) => pattern.length > 0)
-      .map((pattern) => pattern.replace(/\\/g, '/'));
-    if (ignorePatterns.length > 0) {
-      ig.add(ignorePatterns);
-    }
-    if (gitignorePatterns.length > 0) {
-      ig.add(gitignorePatterns);
+    if (combinedIgnore.length > 0) {
+      ig.add(combinedIgnore);
     }
 
+    const globIgnore = this.buildGlobIgnorePatterns(combinedIgnore);
     const entries = await glob(['**/*'], {
       onlyFiles: true,
       absolute: true,
       dot: true,
-      ignore: GLOB_IGNORE,
+      ignore: [...GLOB_IGNORE, ...globIgnore],
     });
 
     const relativePaths = entries
@@ -114,22 +115,70 @@ export class FsService {
     return fs.readFile(absolute, 'utf8');
   }
 
-  private async readGitignorePatterns(): Promise<string[]> {
-    const gitignorePath = path.join(process.cwd(), '.gitignore');
+  private toPosixPath(relativePath: string): string {
+    return relativePath.split(path.sep).join(path.posix.sep);
+  }
+
+  private normalizeIgnorePatterns(patterns: string[]): string[] {
+    return patterns
+      .map((pattern) => pattern.trim())
+      .filter((pattern) => pattern.length > 0 && !pattern.startsWith('#'));
+  }
+
+  private buildGlobIgnorePatterns(patterns: string[]): string[] {
+    const normalized = patterns
+      .map((pattern) => pattern.trim())
+      .filter(
+        (pattern) =>
+          pattern.length > 0 &&
+          !pattern.startsWith('#') &&
+          !pattern.startsWith('!'),
+      )
+      .map((pattern) => pattern.replace(/\\/g, '/'));
+
+    const result = new Set<string>();
+
+    for (const pattern of normalized) {
+      const trimmed = pattern.replace(/\/+$/, '');
+      result.add(pattern);
+
+      if (trimmed.length === 0) {
+        continue;
+      }
+
+      if (!pattern.includes('*')) {
+        result.add(`${trimmed}/**`);
+        result.add(`**/${trimmed}/**`);
+      }
+
+      if (!pattern.startsWith('**/')) {
+        result.add(`**/${trimmed}`);
+      }
+
+      if (pattern.endsWith('/')) {
+        result.add(`${trimmed}/**`);
+      }
+    }
+
+    return [...result];
+  }
+
+  private async readIgnoreFile(fileName: string): Promise<string[]> {
+    const target = path.join(process.cwd(), fileName);
 
     try {
-      const content = await fs.readFile(gitignorePath, 'utf8');
-      return content
-        .split(/\r?\n/)
-        .map((line) => line.trim())
-        .filter((line) => line.length > 0 && !line.startsWith('#'));
+      const content = await fs.readFile(target, 'utf8');
+      return this.parseIgnoreContent(content);
     } catch {
       return [];
     }
   }
 
-  private toPosixPath(relativePath: string): string {
-    return relativePath.split(path.sep).join(path.posix.sep);
+  private parseIgnoreContent(content: string): string[] {
+    return content
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0 && !line.startsWith('#'));
   }
 
   private isBinaryExtension(relativePath: string): boolean {

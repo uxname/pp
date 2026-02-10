@@ -124,8 +124,7 @@ export class PackCommand extends CommandRunner {
     const chunks = await Promise.all(
       files.map(async (file) => {
         const content = await this.fsService.readFileRelative(file);
-        const posixPath = file.split(path.sep).join(path.posix.sep);
-        return `// file: ${posixPath}\n${content}`;
+        return `// file: ${file}\n${content}`;
       }),
     );
 

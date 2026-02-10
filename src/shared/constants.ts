@@ -3,6 +3,7 @@ export const WARNING_TOKEN_THRESHOLD = 12_000;
 export const DEFAULT_COMMIT_TOKENS = 1_500;
 export const DEFAULT_REVIEW_TOKENS = 5_000;
 export const DEFAULT_LLM_MODEL = 'gpt-4o';
+export const DEFAULT_PRICE_PER_MILLION = 5;
 
 const BINARY_EXTENSION_LIST = [
   '.png',

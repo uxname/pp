@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { encodingForModel, getEncoding, type TiktokenModel } from 'js-tiktoken';
 import { ConfigService } from '../../core/config/config.service';
-import { DEFAULT_LLM_MODEL } from '../constants';
+import { DEFAULT_LLM_MODEL, DEFAULT_PRICE_PER_MILLION } from '../constants';
 
 type TokenEstimate = {
   tokens: number;
@@ -31,7 +31,7 @@ export class TokenizerService {
     const config = this.configService.getConfig();
     const model = config.llm?.model ?? `openai/${DEFAULT_LLM_MODEL}`;
     const key = this.normalizeModelKey(model);
-    return PRICE_PER_MILLION[key] ?? 0;
+    return PRICE_PER_MILLION[key] ?? DEFAULT_PRICE_PER_MILLION;
   }
 
   private createEncoder() {
